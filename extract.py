@@ -3,34 +3,63 @@ import os
 import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-def chrome_driver_setup():
+def chrome_driver():
     """Sets up the Chrome WebDriver."""
     driver_path = ChromeDriverManager().install()
     print(f"ChromeDriver installed at: {driver_path}")
 
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless=new")
+    options.add_argument("--headless")
     options.add_argument("--no-sandbox")
 
     #Check if it is executable
     if not os.access(driver_path, os.X_OK):
         print("Not executable, changing permissions.")
-        os.chmod(driver_path, 0o755)
-
         for root, dirs, files in os.walk(os.path.dirname(driver_path)):
-            for dir in dirs:
-                os.chmod(os.path.join(root, dir), 0o755)
             for file in files:
-                os.chmod(os.path.join(root, file), 0o755)
                 if "chromedriver" in file and not file.endswith(".chromedriver"):
                     potential_path = os.path.join(root, file)
                     print("Fund likely chromedriver at:", potential_path)
                     driver_path = potential_path
-                    os.chmod(os.path.join(root, file), 0o755)
                     break
     
-    return webdriver.Chrome(service=Service(driver_path), options=options)
+    return webdriver.Chrome(service=ChromeService(driver_path), options=options)
+
+
+# Test the requests library
+url = "https://www.netflix.com/tudum/top10"
+r = requests.get(url)
+print("Status Code:", r.status_code)
+
+driver = chrome_driver()
+driver.get(url)
+
+
+def extract_data(driver):
+    """Extracts data from the Netflix Top 10 page."""
+    movie_names = []
+    views_list = []
+    runtime_list = []
+    time.sleep(5)  # Wait for the page to load
+
+    driver.get(url)
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
+
+    movies = soup.find_all('td', class_='title')
+    for movie in movies:
+        title = movie.get_text(strip=True)
+        movie_names.append(title)
+
+    views = soup.find_all('td', class_='views')
+    for view in views:
+        view_count = view.get_text(strip=True)
+        views_list.append(view_count)
+
+    runtimes = soup.find_all('td', class_='tdesktop-only', attrs={'data-uia': 'top10-table-row-hours'})
+    for runtime in runtimes:
+        time_long = runtime.get_text(strip=True)
+        runtime_list.append(time_long)
