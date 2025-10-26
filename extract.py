@@ -31,8 +31,12 @@ def chrome_driver():
 
 
 # Test the requests library
-url = "https://www.netflix.com/tudum/top10"
-r = requests.get(url)
+url = "https://www.netflix.com/tudum/top10/"
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Accept-Encoding': 'identity'
+}
+r = requests.get(url, headers=headers) # Zmień tę linię
 print("Status Code:", r.status_code)
 
 driver = chrome_driver()
