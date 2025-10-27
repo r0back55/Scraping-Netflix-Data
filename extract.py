@@ -63,7 +63,17 @@ def extract_data(driver):
         view_count = view.get_text(strip=True)
         views_list.append(view_count)
 
-    runtimes = soup.find_all('td', class_='tdesktop-only', attrs={'data-uia': 'top10-table-row-hours'})
+    runtimes = soup.find_all('td', class_='desktop-only', attrs={'data-uia': 'top10-table-row-hours'})
     for runtime in runtimes:
         time_long = runtime.get_text(strip=True)
         runtime_list.append(time_long)
+
+    return movie_names, views_list, runtime_list
+
+
+movie_names, views_list, runtime_list = extract_data(driver)
+for i in range(len(movie_names)):
+    print(f"{i+1}. {movie_names[i][2:].lstrip()} - Views: {views_list[i]} - Runtime: {runtime_list[i]}") 
+
+driver.quit()
+# The code above extracts and prints the top 10 Netflix movies along with their view counts and runtimes.
