@@ -1,10 +1,13 @@
 import requests
 import os
 import time
+import pandas as pd
+import csv
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
+from pathlib import Path
 
 
 def chrome_driver():
@@ -68,12 +71,22 @@ def extract_data(driver):
         time_long = runtime.get_text(strip=True)
         runtime_list.append(time_long)
 
-    return movie_names, views_list, runtime_list
+    # Save as .csv using proper CSV writer
+    print("Saving data to CSV file...")
+    file_path = Path("D:/Programowanie/ETL_Pipelines/Scraping-Netflix-Data/netflix_top10.csv")
+    
+    with open(file_path, "w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(["Rank", "Movie Name", "Views", "Runtime"])
+        for i in range(len(movie_names)):
+            writer.writerow([i+1, movie_names[i], views_list[i], runtime_list[i]])
+
+    print("Data saved successfully.")
 
 
-movie_names, views_list, runtime_list = extract_data(driver)
-for i in range(len(movie_names)):
-    print(f"{i+1}. {movie_names[i][2:].lstrip()} - Views: {views_list[i]} - Runtime: {runtime_list[i]}") 
+extract_data(driver)
+df = pd.read_csv("D:/Programowanie/ETL_Pipelines/Scraping-Netflix-Data/netflix_top10.csv")
+print(df.head(10))
+
 
 driver.quit()
-# The code above extracts and prints the top 10 Netflix movies along with their view counts and runtimes.
