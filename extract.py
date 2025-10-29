@@ -79,7 +79,7 @@ def extract_data(driver):
         writer = csv.writer(file)
         writer.writerow(["Rank", "Movie Name", "Views", "Runtime"])
         for i in range(len(movie_names)):
-            writer.writerow([i+1, movie_names[i], views_list[i], runtime_list[i]])
+            writer.writerow([i+1, movie_names[i][2:], views_list[i], runtime_list[i]])
 
     print("Data saved successfully.")
 
