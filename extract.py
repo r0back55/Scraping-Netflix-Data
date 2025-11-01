@@ -84,9 +84,11 @@ def extract_data(driver):
     print("Data saved successfully.")
 
 
+# Extract data and display the first 10 rows
 extract_data(driver)
 df = pd.read_csv("D:/Programowanie/ETL_Pipelines/Scraping-Netflix-Data/netflix_top10.csv")
 print(df.head(10))
 
 
+# Exit the driver
 driver.quit()
